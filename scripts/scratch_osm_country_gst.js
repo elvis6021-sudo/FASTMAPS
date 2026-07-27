@@ -11,15 +11,15 @@ const path = require('path');
 const { buildGeoSet } = require('../lib/osm/gstWriter');
 const { buildCountryLayers } = require('../lib/osm/countryMapTemplate');
 
-const OUT_DIR = path.join(__dirname, 'output', 'osm_ecuador');
+const { OUT_DIR, CODE, NAME, BBOX, tab, lyr } = require('./genConfig');
 // MBR real de Ecuador continental + Galápagos (Geofabrik incluye ambos en el extracto de país).
-const BBOX = { south: -5.1, west: -92.1, north: 1.6, east: -75.1 };
+
 
 const gst = buildGeoSet({
-  name: 'ecuador_osm',
+  name: NAME,
   bbox: BBOX,
-  layers: buildCountryLayers('EC'),
+  layers: buildCountryLayers(CODE),
 });
-const gstPath = path.join(OUT_DIR, 'ecuador_osm.gst');
+const gstPath = path.join(OUT_DIR, NAME + '.gst');
 fs.writeFileSync(gstPath, gst);
 console.log(`Escrito ${gstPath}`);

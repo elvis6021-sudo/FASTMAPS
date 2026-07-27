@@ -1,6 +1,10 @@
 # FastMaps · Editor de escritorio (Electron)
 
-Envuelve el editor de estilo `.gst` (`../editor/index.html`) como **app de escritorio**, con:
+App de escritorio con **dos módulos**:
+1. **Generar mapa** (OSM → MapInfo/Navteq): eliges un `.osm.pbf` y produce las capas `.TAB` + el `.gst`.
+2. **Editar estilo** (`.gst`): carga, edita color/grosor/zoom/orden con vista previa (escena y **mapa real**) y exporta.
+
+Envuelve `../editor/index.html`, con:
 
 - **Abrir / Guardar `.gst` nativos** (diálogos del sistema, con fidelidad de bytes).
 - **Vista previa de estilo en vivo** (escena de ejemplo) — ya funciona.
@@ -11,9 +15,16 @@ Envuelve el editor de estilo `.gst` (`../editor/index.html`) como **app de escri
 - En Windows: las herramientas de compilación para `gdal-async` (normalmente vienen con el binario precompilado de npm; no suele hacer falta compilar).
 
 ## Cómo correrlo
+El módulo **Generar** corre el pipeline (scripts en `../scripts/`) que usa `gdal-async` y
+`osm-pbf-parser`, resueltos desde la RAÍZ del repo. Por eso hay que instalar en los dos sitios:
 ```bash
+# 1) dependencias del pipeline (en la raíz del repo)
+cd FASTMAPS
+npm install
+
+# 2) dependencias de la app de escritorio
 cd desktop
-npm install        # instala electron + gdal-async
+npm install
 npm start          # abre la app
 ```
 

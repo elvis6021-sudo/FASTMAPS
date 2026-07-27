@@ -9,8 +9,7 @@ const { writeStreetsTab, ROAD_CLASSES } = require('../lib/osm/mapInfoStreetsWrit
 const { writePolygonTab } = require('../lib/osm/mapInfoPolygonWriter');
 const { writePointTab } = require('../lib/osm/mapInfoPointWriter');
 
-const PBF_PATH = path.join(__dirname, 'output', 'osm_ecuador', 'ecuador.osm.pbf');
-const OUT_DIR = path.join(__dirname, 'output', 'osm_ecuador');
+const { PBF_PATH, OUT_DIR, CODE, NAME, BBOX, tab, lyr } = require('./genConfig');
 
 function log(msg) {
   console.log(`[${new Date().toISOString().slice(11, 19)}] ${msg}`);
@@ -39,25 +38,25 @@ async function main() {
   };
   for (const roadClass of ROAD_CLASSES) {
     const label = CLASS_FILE[roadClass];
-    const r = writeStreetsTab(groups.streets, path.join(OUT_DIR, `${label}_EC_OSM.TAB`), `${label}_EC_OSM`, { roadClass });
+    const r = writeStreetsTab(groups.streets, tab(label), lyr(label), { roadClass });
     log(`${label} (${roadClass}): ${r.wayCount} escritas, ${r.skipped} descartadas`);
   }
 
-  const buildingsResult = writePolygonTab(groups.buildings, path.join(OUT_DIR, 'Buildings_EC_OSM.TAB'), 'Buildings_EC_OSM');
+  const buildingsResult = writePolygonTab(groups.buildings, tab('Buildings'), lyr('Buildings'));
   log(`Buildings: ${buildingsResult.wayCount} escritos, ${buildingsResult.skipped} descartados`);
 
-  const landuseResult = writePolygonTab(groups.landuse, path.join(OUT_DIR, 'LandUse_EC_OSM.TAB'), 'LandUse_EC_OSM', {
+  const landuseResult = writePolygonTab(groups.landuse, tab('LandUse'), lyr('LandUse'), {
     extraFields: [{ name: 'Landuse', tagKey: 'landuse' }],
   });
   log(`LandUse: ${landuseResult.wayCount} escritas, ${landuseResult.skipped} descartadas`);
 
-  const greenResult = writePolygonTab(groups.green, path.join(OUT_DIR, 'Green_EC_OSM.TAB'), 'Green_EC_OSM');
+  const greenResult = writePolygonTab(groups.green, tab('Green'), lyr('Green'));
   log(`Green: ${greenResult.wayCount} escritas, ${greenResult.skipped} descartadas`);
 
   log('Pasada de nodos con amenity/shop (POIs)...');
   const poiNodes = await collectTaggedNodes(PBF_PATH, (t) => !!t.amenity || !!t.shop);
   log(`POIs encontrados: ${poiNodes.length}`);
-  const poiResult = writePointTab(poiNodes, path.join(OUT_DIR, 'Poi_EC_OSM.TAB'), 'Poi_EC_OSM', {
+  const poiResult = writePointTab(poiNodes, tab('Poi'), lyr('Poi'), {
     extraFields: [{ name: 'Amenity', tagKey: 'amenity' }, { name: 'Shop', tagKey: 'shop' }],
   });
   log(`Poi: ${poiResult.pointCount} escritos`);

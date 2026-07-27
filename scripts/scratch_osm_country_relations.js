@@ -6,8 +6,7 @@ const { parseOsmPbfWays, parseOsmPbfRelationsMulti } = require('../lib/osm/osmPb
 const { writeStreetsTab } = require('../lib/osm/mapInfoStreetsWriter');
 const { writeMultiPolygonTab } = require('../lib/osm/mapInfoMultiPolygonWriter');
 
-const PBF_PATH = path.join(__dirname, 'output', 'osm_ecuador', 'ecuador.osm.pbf');
-const OUT_DIR = path.join(__dirname, 'output', 'osm_ecuador');
+const { PBF_PATH, OUT_DIR, CODE, NAME, BBOX, tab, lyr } = require('./genConfig');
 
 function log(msg) {
   console.log(`[${new Date().toISOString().slice(11, 19)}] ${msg}`);
@@ -18,7 +17,7 @@ async function main() {
 
   log('Ríos/arroyos (ways simples, línea)...');
   const rivers = await parseOsmPbfWays(PBF_PATH, (t) => t.waterway === 'river' || t.waterway === 'stream' || t.waterway === 'canal');
-  const riversResult = writeStreetsTab(rivers, path.join(OUT_DIR, 'Rivers_EC_OSM.TAB'), 'Rivers_EC_OSM', {});
+  const riversResult = writeStreetsTab(rivers, tab('Rivers'), lyr('Rivers'), {});
   log(`Rivers: ${rivers.ways.length} ways, ${riversResult.wayCount} escritas`);
 
   log('Relaciones multipolígono: agua / bosques-parques grandes / límites administrativos...');
@@ -29,13 +28,13 @@ async function main() {
   });
   log(`water rel=${rels.water.length} greenBig rel=${rels.greenBig.length} admin rel=${rels.admin.length}`);
 
-  const waterResult = writeMultiPolygonTab(rels.water, path.join(OUT_DIR, 'Water_EC_OSM.TAB'), 'Water_EC_OSM');
+  const waterResult = writeMultiPolygonTab(rels.water, tab('Water'), lyr('Water'));
   log(`Water: ${waterResult.featureCount} escritas, ${waterResult.skipped} descartadas`);
 
-  const greenBigResult = writeMultiPolygonTab(rels.greenBig, path.join(OUT_DIR, 'GreenBig_EC_OSM.TAB'), 'GreenBig_EC_OSM');
+  const greenBigResult = writeMultiPolygonTab(rels.greenBig, tab('GreenBig'), lyr('GreenBig'));
   log(`GreenBig: ${greenBigResult.featureCount} escritas, ${greenBigResult.skipped} descartadas`);
 
-  const adminResult = writeMultiPolygonTab(rels.admin, path.join(OUT_DIR, 'Admin_EC_OSM.TAB'), 'Admin_EC_OSM');
+  const adminResult = writeMultiPolygonTab(rels.admin, tab('Admin'), lyr('Admin'));
   log(`Admin: ${adminResult.featureCount} escritas, ${adminResult.skipped} descartadas`);
 
   const t1 = Date.now();

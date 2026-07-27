@@ -81,3 +81,9 @@ Fase 1 primero (máximo impacto visual con mínimo esfuerzo: solo texto/estilo),
 - `reference/gstParser.js` — parser validado (formato COLORREF correcto) → base del editor.
 - `reference/mapStyle.ts` — traduce `.gst` → MapLibre → base del preview.
 - `scripts/scratch_osm_gst_poc.js` — ejemplo end-to-end corto (área chica).
+
+## Módulo "Generar mapa" en la app (OSM → MapInfo) ✅ (2026-07-27)
+- [x] Scripts del pipeline parametrizados por env (`scripts/genConfig.js`: `FM_PBF/FM_OUT/FM_CODE/FM_NAME/FM_BBOX`), con Ecuador por defecto. Probado generando `.gst` de EC y CO.
+- [x] App de escritorio con **2 módulos** (navegación arriba): **Generar mapa** (elige `.pbf`, corre el pipeline con log en vivo, y "Abrir el .gst en el editor") y **Editar estilo**.
+- [x] Electron: `pick-pbf`/`pick-folder`/`generate-map` (spawn de los 4 scripts con `ELECTRON_RUN_AS_NODE`) + `read-gst`.
+- **Requiere** `npm install` en la raíz (pipeline: gdal-async, osm-pbf-parser) y en `desktop/` (electron).

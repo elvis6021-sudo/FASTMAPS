@@ -46,7 +46,9 @@
 </head>
 <body>
 <header>
-  <h1>FastMaps · Editor <code>.gst</code></h1>
+  <h1>FastMaps</h1>
+  <button class="btn" id="navGen" style="background:#eef4fa;color:#164469">① Generar mapa</button>
+  <button class="btn" id="navEdit" style="background:#009CEB;color:#fff">② Editar estilo</button>
   <span class="tag" id="gstName">—</span>
   <span class="sp"></span>
   <label class="btn btn-g">Cargar .gst<input id="fileInput" type="file" accept=".gst" hidden></label>
@@ -54,7 +56,27 @@
   <button class="btn btn-p" id="btnExport">Exportar .gst</button>
 </header>
 
-<div class="layout">
+<!-- MÓDULO 1: Generar (OSM -> MapInfo) -->
+<div id="modGen" style="display:none;max-width:920px;margin:1.2rem auto;padding:0 1rem 3rem">
+  <div class="card">
+    <h2 style="font-size:1rem;color:#164469">Generar mapa · OSM → MapInfo (formato tipo Navteq)</h2>
+    <p class="hint" style="margin:.3rem 0 1rem">Convierte un extracto de OpenStreetMap (<code>.osm.pbf</code>, ej. de Geofabrik) en las capas <code>.TAB</code> + el <code>.gst</code> listo para Roadshow. Solo en la app de escritorio.</p>
+    <div style="display:grid;gap:.8rem;max-width:660px">
+      <div><label>Archivo <b>.osm.pbf</b></label><div class="sw-wrap"><button class="btn btn-g" id="genPbf">Elegir…</button><span class="muted-cell" id="genPbfPath">—</span></div></div>
+      <div><label>Carpeta de salida</label><div class="sw-wrap"><button class="btn btn-g" id="genOut">Elegir…</button><span class="muted-cell" id="genOutPath">— (por defecto, junto al .pbf)</span></div></div>
+      <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
+        <div><label>Código país</label><br><input id="genCode" value="EC" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:.35rem"></div>
+        <div style="flex:1;min-width:180px"><label>Nombre del geoset</label><br><input id="genName" value="ecuador_osm" style="width:100%;border:1px solid var(--line);border-radius:6px;padding:.35rem"></div>
+      </div>
+      <div><label>BBOX <span class="muted-cell">w,s,e,n — MBR del país para el .gst (opcional)</span></label><br><input id="genBbox" placeholder="-92.1,-5.1,-75.1,1.6" style="width:100%;border:1px solid var(--line);border-radius:6px;padding:.35rem"></div>
+      <div><button class="btn btn-p" id="genRun">▶ Generar mapa</button> <button class="btn btn-g" id="genOpen" style="display:none">Abrir el .gst en el editor →</button></div>
+    </div>
+    <pre id="genLog" style="height:300px;overflow:auto;background:#0e2247;color:#cfe4f5;padding:.7rem;border-radius:8px;font-size:.76rem;margin-top:1rem;white-space:pre-wrap"></pre>
+  </div>
+</div>
+
+<!-- MÓDULO 2: Editar estilo -->
+<div class="layout" id="modEdit">
   <div>
     <div class="meta" id="meta">Carga un <code>.gst</code> o abre la muestra.</div>
     <div id="content"><div class="empty">Sin datos.</div></div>
@@ -1393,6 +1415,40 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(lbl) lbl.addEventListener('click', async e=>{ e.preventDefault(); const r=await window.fastmaps.openGst(); if(r){ GST_DIR=(r.path||'').replace(/[\\/][^\\/]*$/,''); CENTER=null; VIEW=null; load(r.text, (r.path||'').split(/[\\/]/).pop().replace(/\.gst$/i,'')); if(REAL_ACTIVE) loadRealMap(); } });
   }
 });
+</script>
+<script>
+// ─── Navegación de módulos + módulo Generar ─────────────────────────────────
+(function(){
+  const modGen=document.getElementById('modGen'), modEdit=document.getElementById('modEdit');
+  const navGen=document.getElementById('navGen'), navEdit=document.getElementById('navEdit');
+  function show(gen){ modGen.style.display=gen?'block':'none'; modEdit.style.display=gen?'none':'grid';
+    navGen.style.background=gen?'#009CEB':'#eef4fa'; navGen.style.color=gen?'#fff':'#164469';
+    navEdit.style.background=gen?'#eef4fa':'#009CEB'; navEdit.style.color=gen?'#164469':'#fff'; }
+  navGen.onclick=()=>show(true); navEdit.onclick=()=>show(false);
+  const log=document.getElementById('genLog');
+  const put=t=>{ log.textContent+=t; log.scrollTop=log.scrollHeight; };
+  const $=id=>document.getElementById(id);
+  if(!(window.fastmaps&&window.fastmaps.generateMap)){
+    put('Este módulo solo funciona en la app de escritorio (Electron).\nEn el navegador solo está disponible "Editar estilo".\n');
+    if($('genRun')) $('genRun').disabled=true; return;
+  }
+  window.fastmaps.onGenLog(put);
+  let PBF=null, OUT=null, LASTGST=null;
+  $('genPbf').onclick=async()=>{ const p=await window.fastmaps.pickPbf(); if(p){ PBF=p; $('genPbfPath').textContent=p; if(!OUT){ OUT=p.replace(/[\\/][^\\/]*$/,''); $('genOutPath').textContent=OUT; } } };
+  $('genOut').onclick=async()=>{ const p=await window.fastmaps.pickFolder(); if(p){ OUT=p; $('genOutPath').textContent=p; } };
+  $('genRun').onclick=async()=>{
+    if(!PBF){ put('⚠ Elige primero el archivo .osm.pbf\n'); return; }
+    const code=$('genCode').value.trim()||'EC', name=$('genName').value.trim()||'mapa_osm', bbox=$('genBbox').value.trim();
+    $('genRun').disabled=true; $('genOpen').style.display='none';
+    put('\n=== Generando ('+code+') — puede tardar varios minutos ===\n');
+    try{
+      const r=await window.fastmaps.generateMap({pbf:PBF,out:OUT,code,name,bbox}); LASTGST=r.gstPath;
+      const go=$('genOpen'); go.style.display='inline-block';
+      go.onclick=async()=>{ const g=await window.fastmaps.readGst(LASTGST); GST_DIR=(LASTGST||'').replace(/[\\/][^\\/]*$/,''); CENTER=null; VIEW=null; load(g.text, name); show(false); };
+    }catch(e){ put('\n❌ Error: '+((e&&e.message)||e)+'\n'); }
+    $('genRun').disabled=false;
+  };
+})();
 </script>
 </body>
 </html>
