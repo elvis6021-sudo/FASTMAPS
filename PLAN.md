@@ -48,12 +48,12 @@
 - **Cómo usarlo:** abrir `editor/index.html` → "Cargar .gst" (o "Cargar muestra") → editar → "Exportar .gst" → copiar a la carpeta de Roadshow.
 - **Falta (Fase 4):** vista previa del mapa real + reordenar capas (drag&drop) + empaquetar como app de escritorio.
 
-## Fase 4 — Vista previa en vivo (el gran salto de UX)
-**Meta:** ver el mapa real actualizándose mientras ajustas, con osm.org al lado.
-- [ ] Backend lee la geometría real de los `.TAB` por bounding box (`gdal-async` / `mapInfoReader.js`) → GeoJSON.
-- [ ] Frontend **MapLibre GL** + `reference/mapStyle.ts` (que ya traduce `.gst` → capas Mapbox/MapLibre) → preview real.
-- [ ] **Reordenar capas** con drag & drop.
-- **Entregable:** editor con preview en vivo y comparación contra referencia.
+## Fase 4 — Vista previa en vivo + reordenar
+**Meta:** ver el resultado mientras ajustas y poder cambiar el orden de dibujo.
+- [x] **Vista previa en vivo** (2026-07-27): escena de ejemplo (agua, parque, edificios, río, red vial con las 6 clases + casing + flecha oneway) dibujada en SVG con los estilos actuales, en el orden real de las capas; se actualiza al editar. Sirve para calibrar comparando con openstreetmap.org.
+- [x] **Reordenar capas** con drag & drop (renumeración correcta de `\TABLE\N` al exportar).
+- [ ] **Preview con geometría REAL** del `.TAB` (Electron + Node `gdal-async`/`mapInfoReader.js` → GeoJSON → MapLibre GL, reusando `reference/mapStyle.ts`). Necesita el entorno Windows/gdal; la escena de ejemplo cubre la calibración de estilo mientras tanto.
+- [ ] Empaquetar como **app de escritorio** (Electron).
 
 ## Fase 5 — Detalles finos + ligereza
 **Meta:** rematar el look y garantizar que sea liviano y rápido.

@@ -6,62 +6,68 @@
 <title>FastMaps · Editor de estilo .gst</title>
 <style>
   * { box-sizing: border-box; }
-  :root { --azul:#009CEB; --navy:#164469; --navy2:#0e2247; --line:#e3e8ef; --muted:#6b7787; }
+  :root { --azul:#009CEB; --navy:#164469; --line:#e3e8ef; --muted:#6b7787; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:#1f2733; background:#f4f6f9; }
-  header {
-    position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-    padding:.7rem 1.2rem; background:linear-gradient(160deg,#0e2247,#081225); color:#fff;
-    box-shadow:0 2px 12px rgba(14,34,71,.18);
-  }
-  header h1 { font-size:1.05rem; margin:0; font-weight:700; letter-spacing:.2px; }
+  header { position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:.8rem; flex-wrap:wrap;
+    padding:.7rem 1.2rem; background:linear-gradient(160deg,#0e2247,#081225); color:#fff; box-shadow:0 2px 12px rgba(14,34,71,.18); }
+  header h1 { font-size:1.02rem; margin:0; font-weight:700; }
   header .sp { flex:1; }
-  .btn { border:0; border-radius:8px; padding:.5rem .95rem; font-weight:600; font-size:.9rem; cursor:pointer; }
-  .btn-p { background:var(--azul); color:#fff; }
-  .btn-g { background:rgba(255,255,255,.14); color:#fff; }
+  .btn { border:0; border-radius:8px; padding:.5rem .95rem; font-weight:600; font-size:.88rem; cursor:pointer; }
+  .btn-p { background:var(--azul); color:#fff; } .btn-g { background:rgba(255,255,255,.14); color:#fff; }
   .btn:hover { filter:brightness(1.08); }
-  .wrap { max-width:1180px; margin:1.1rem auto; padding:0 1rem 3rem; }
-  .meta { color:var(--muted); font-size:.85rem; margin:.2rem 0 1rem; }
+  .tag { display:inline-block; font-size:.68rem; padding:.05rem .45rem; border-radius:999px; background:rgba(255,255,255,.16); color:#fff; }
+  .layout { display:grid; grid-template-columns: 1fr 420px; gap:1rem; max-width:1440px; margin:1rem auto; padding:0 1rem 3rem; }
+  @media (max-width:1080px){ .layout{ grid-template-columns:1fr; } }
+  .meta { color:var(--muted); font-size:.85rem; margin:.1rem 0 .7rem; }
   table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 6px 22px rgba(14,34,71,.06); }
-  thead th { text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:.7rem .6rem; border-bottom:1px solid var(--line); background:#fafbfc; }
-  tbody td { padding:.5rem .6rem; border-bottom:1px solid var(--line); font-size:.9rem; vertical-align:middle; }
+  thead th { text-align:left; font-size:.68rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:.6rem .5rem; border-bottom:1px solid var(--line); background:#fafbfc; }
+  tbody td { padding:.4rem .5rem; border-bottom:1px solid var(--line); font-size:.86rem; vertical-align:middle; }
+  tbody tr { cursor:grab; } tbody tr.drag { opacity:.4; } tbody tr.over td { border-top:2px solid var(--azul); }
   tbody tr:hover { background:#f7fafd; }
-  .ord { color:var(--muted); font-variant-numeric:tabular-nums; width:2.2rem; }
-  .desc input { width:100%; border:1px solid transparent; background:transparent; border-radius:6px; padding:.35rem .4rem; font-size:.9rem; color:#1f2733; }
-  .desc input:hover, .desc input:focus { border-color:var(--line); background:#fff; outline:none; }
-  .file { color:var(--muted); font-size:.75rem; }
-  .swatch { display:inline-block; height:0; vertical-align:middle; border-radius:2px; width:46px; }
-  .sw-wrap { display:flex; align-items:center; gap:.5rem; }
-  input[type=color] { width:34px; height:26px; border:1px solid var(--line); border-radius:6px; padding:0; background:#fff; cursor:pointer; }
-  input[type=number] { width:58px; border:1px solid var(--line); border-radius:6px; padding:.32rem .4rem; font-size:.85rem; }
-  .muted-cell { color:var(--muted); font-size:.8rem; }
+  .grip { color:#c2ccd8; cursor:grab; user-select:none; }
+  .ord { color:var(--muted); font-variant-numeric:tabular-nums; width:1.6rem; text-align:right; }
+  .desc input { width:100%; border:1px solid transparent; background:transparent; border-radius:6px; padding:.3rem .35rem; font-size:.86rem; }
+  .desc input:hover,.desc input:focus { border-color:var(--line); background:#fff; outline:none; }
+  .file { color:var(--muted); font-size:.72rem; }
+  .cas { display:inline-block; font-size:.62rem; padding:.02rem .35rem; border-radius:999px; background:#eef4fa; color:var(--navy); margin-left:.3rem; }
+  .sw-wrap { display:flex; align-items:center; gap:.35rem; }
+  input[type=color] { width:30px; height:24px; border:1px solid var(--line); border-radius:6px; padding:0; background:#fff; cursor:pointer; }
+  input[type=number] { width:52px; border:1px solid var(--line); border-radius:6px; padding:.28rem .35rem; font-size:.82rem; }
+  .muted-cell { color:var(--muted); font-size:.74rem; }
   .chk { width:16px; height:16px; accent-color:var(--azul); }
-  .tag { display:inline-block; font-size:.68rem; padding:.05rem .4rem; border-radius:999px; background:#eef4fa; color:var(--navy); margin-left:.35rem; }
+  .side { position:sticky; top:70px; align-self:start; }
+  .card { background:#fff; border-radius:12px; box-shadow:0 6px 22px rgba(14,34,71,.06); padding:.9rem; }
+  .card h2 { font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:.1rem 0 .6rem; }
+  #preview { width:100%; height:auto; border-radius:10px; border:1px solid var(--line); display:block; }
+  .hint { font-size:.76rem; color:var(--muted); margin-top:.6rem; line-height:1.5; }
+  .hint a { color:var(--azul); }
   .empty { text-align:center; color:var(--muted); padding:3rem 1rem; }
-  .legend { font-size:.78rem; color:var(--muted); margin-top:.8rem; }
-  .preview td { min-width:70px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>FastMaps · Editor de estilo <code>.gst</code></h1>
+  <h1>FastMaps · Editor <code>.gst</code></h1>
   <span class="tag" id="gstName">—</span>
   <span class="sp"></span>
   <label class="btn btn-g">Cargar .gst<input id="fileInput" type="file" accept=".gst" hidden></label>
-  <button class="btn btn-g" id="btnSample">Cargar muestra (Ecuador)</button>
+  <button class="btn btn-g" id="btnSample">Muestra</button>
   <button class="btn btn-p" id="btnExport">Exportar .gst</button>
 </header>
 
-<div class="wrap">
-  <div class="meta" id="meta">Carga un archivo <code>.gst</code> o abre la muestra para empezar.</div>
-  <div id="content"><div class="empty">Sin datos todavía.</div></div>
-  <div class="legend">
-    Orden = orden de dibujo (arriba = se dibuja primero / más al fondo; abajo = encima).
-    El color se guarda en formato COLORREF de MapInfo automáticamente. Las claves que no editas se
-    preservan intactas al exportar.
+<div class="layout">
+  <div>
+    <div class="meta" id="meta">Carga un <code>.gst</code> o abre la muestra.</div>
+    <div id="content"><div class="empty">Sin datos.</div></div>
+  </div>
+  <div class="side">
+    <div class="card">
+      <h2>Vista previa (escena de ejemplo)</h2>
+      <svg id="preview" viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="hint">Se dibuja con tus estilos actuales, en el orden de las capas (casing incluido). Compárala con <a href="https://www.openstreetmap.org" target="_blank">openstreetmap.org</a> y ajusta color/grosor. Arrastra las filas para reordenar el dibujo.</div>
+    </div>
   </div>
 </div>
 
-<!-- Muestra incrustada (Ecuador). El editor la carga con "Cargar muestra". -->
 <script type="text/plain" id="sampleGst">!GEOSET
 !VERSION 450
 begin_metadata
@@ -1108,172 +1114,184 @@ begin_metadata
 "\TABLE\24\LABEL\POSITION" = "2"
 end_metadata
 </script>
-
 <script>
 // ─── color COLORREF <-> hex ────────────────────────────────────────────────
-function decToHex(dec) {
-  const n = (Number(dec) >>> 0);
-  const r = n & 0xff, g = (n >> 8) & 0xff, b = (n >> 16) & 0xff;
-  return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
-}
-function hexToDec(hex) {
-  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
-  if (!m) return 0;
-  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
-  return r + (g << 8) + (b << 16); // COLORREF
-}
-
-// ─── estado ────────────────────────────────────────────────────────────────
-let LINES = [];       // líneas crudas del .gst (preservadas)
-let KEYLINE = {};     // "clave" -> índice de línea
-let LAYERS = [];      // capas parseadas
-
+const decToHex = d => { const n=Number(d)>>>0; const r=n&0xff,g=(n>>8)&0xff,b=(n>>16)&0xff; return '#'+[r,g,b].map(c=>c.toString(16).padStart(2,'0')).join(''); };
+const hexToDec = h => { const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(h); if(!m) return 0; return parseInt(m[1],16)+(parseInt(m[2],16)<<8)+(parseInt(m[3],16)<<16); };
 const LINE_RE = /^"([^"]*)"\s*=\s*"([^"]*)"\s*$/;
 
-function parseGst(text) {
-  LINES = text.split(/\r?\n/);
-  KEYLINE = {};
-  LINES.forEach((ln, i) => {
-    const m = LINE_RE.exec(ln.trim());
-    if (m) KEYLINE[m[1]] = i;
-  });
-  const val = (key) => { const i = KEYLINE[key]; return i === undefined ? undefined : LINE_RE.exec(LINES[i].trim())[2]; };
+// ─── modelo de bloques (preserva todo, permite reordenar) ───────────────────
+let PRE=[], POST=[], BLOCKS=[], GEONAME='';
+function parseGst(text){
+  const lines = text.split(/\r?\n/);
+  PRE=[]; POST=[]; BLOCKS=[]; GEONAME='';
+  let cur=null, inTables=false, ended=false;
+  for(const raw of lines){
+    const m = LINE_RE.exec(raw.trim());
+    if(m && m[1]==='\\GEOSET\\NAME') GEONAME=m[2];
+    if(ended){ POST.push(raw); continue; }
+    if(raw.trim()==='end_metadata'){ ended=true; POST.push(raw); continue; }
+    const open = m ? /^\\TABLE\\(\d+)$/.exec(m[1]) : null;
+    if(open){ inTables=true; cur={ origN:+open[1], lines:[raw] }; BLOCKS.push(cur); continue; }
+    if(inTables && cur && m && new RegExp('^\\\\TABLE\\\\'+cur.origN+'\\\\').test(m[1])){ cur.lines.push(raw); continue; }
+    if(!inTables) PRE.push(raw); else POST.push(raw);
+  }
+  return BLOCKS.length;
+}
+function bget(b, suffix){ const key='\\TABLE\\'+b.origN+'\\'+suffix; for(const ln of b.lines){ const m=LINE_RE.exec(ln.trim()); if(m&&m[1]===key) return m[2]; } return undefined; }
+function bhas(b, suffix){ return bget(b,suffix)!==undefined; }
+function bset(b, suffix, val){ const key='\\TABLE\\'+b.origN+'\\'+suffix; for(let i=0;i<b.lines.length;i++){ const m=LINE_RE.exec(b.lines[i].trim()); if(m&&m[1]===key){ b.lines[i]='"'+key+'" = "'+val+'"'; return; } } }
 
-  // índices de tabla presentes
-  const idx = new Set();
-  Object.keys(KEYLINE).forEach(k => { const m = /^\\TABLE\\(\d+)\\FILE$/.exec(k); if (m) idx.add(+m[1]); });
-  const sorted = [...idx].sort((a, b) => a - b);
-
-  LAYERS = sorted.map(n => {
-    const base = `\\TABLE\\${n}`;
-    const has = (s) => KEYLINE[`${base}\\${s}`] !== undefined;
-    // color de línea: LINEPEN si existe (capas de línea), si no PEN (borde de polígono)
-    const lineColorKey = has('DISPLAY\\LINEPEN\\Color') ? `${base}\\DISPLAY\\LINEPEN\\Color`
-                        : has('DISPLAY\\PEN\\Color') ? `${base}\\DISPLAY\\PEN\\Color` : null;
-    const widthKey = has('DISPLAY\\LINEPEN\\LineWidth') ? `${base}\\DISPLAY\\LINEPEN\\LineWidth`
-                    : has('DISPLAY\\PEN\\LineWidth') ? `${base}\\DISPLAY\\PEN\\LineWidth` : null;
-    const fillKey = has('DISPLAY\\BRUSH\\Forecolor') ? `${base}\\DISPLAY\\BRUSH\\Forecolor` : null;
-    return {
-      n,
-      fileKey: `${base}\\FILE`,
-      descKey: `${base}\\DESCRIPTION`,
-      zoomMinKey: `${base}\\ZOOM\\MIN`,
-      zoomMaxKey: `${base}\\ZOOM\\MAX`,
-      autoLabelKey: `${base}\\AUTOLABEL`,
-      labelZoomKey: has('LABEL\\ZOOM\\MAX') ? `${base}\\LABEL\\ZOOM\\MAX` : null,
-      lineColorKey, widthKey, fillKey,
-      file: val(`${base}\\FILE`),
-      description: val(`${base}\\DESCRIPTION`),
-    };
-  });
-  return { name: val('\\GEOSET\\NAME'), count: LAYERS.length };
+function fields(b){
+  const lineColor = bhas(b,'DISPLAY\\LINEPEN\\Color') ? 'DISPLAY\\LINEPEN\\Color' : bhas(b,'DISPLAY\\PEN\\Color') ? 'DISPLAY\\PEN\\Color' : null;
+  const width = bhas(b,'DISPLAY\\LINEPEN\\LineWidth') ? 'DISPLAY\\LINEPEN\\LineWidth' : bhas(b,'DISPLAY\\PEN\\LineWidth') ? 'DISPLAY\\PEN\\LineWidth' : null;
+  const fill = bhas(b,'DISPLAY\\BRUSH\\Forecolor') ? 'DISPLAY\\BRUSH\\Forecolor' : null;
+  const labelZoom = bhas(b,'LABEL\\ZOOM\\MAX') ? 'LABEL\\ZOOM\\MAX' : null;
+  return { lineColor, width, fill, labelZoom };
 }
 
-function getVal(key) { const i = KEYLINE[key]; return (i === undefined) ? undefined : LINE_RE.exec(LINES[i].trim())[2]; }
-function setVal(key, value) {
-  const i = KEYLINE[key];
-  if (i === undefined) return;
-  LINES[i] = `"${key}" = "${value}"`;
+// ─── escena de preview ──────────────────────────────────────────────────────
+const SCENE = {
+  land:'#eef0e8',
+  water:[[0,300],[120,288],[150,360],[0,360]],
+  green:[[380,0],[520,0],[520,120],[400,96]],
+  buildings:[[228,150,26,20],[262,150,20,26],[228,178,30,18],[300,138,24,24],[264,182,26,20]],
+  river:[[0,120],[120,140],[240,110],[360,150],[520,122]],
+  roads:{
+    motorway:[[[16,10],[200,150],[360,360]]],
+    trunk:[[[0,60],[180,120],[380,70]]],
+    primary:[[[0,196],[520,150]]],
+    secondary:[[[262,0],[300,360]]],
+    tertiary:[[[300,176],[440,236]]],
+    residential:[[[60,222],[210,212]],[[60,262],[214,252]],[[92,200],[110,300]],[[150,206],[168,300]],[[210,212],[214,252]]],
+    coast:[[[150,360],[120,288],[0,300]]],
+    oneway:[[[214,252],[340,246]]]
+  }
+};
+function roleOf(b){
+  const f=((bget(b,'FILE')||'')+' '+(bget(b,'DESCRIPTION')||'')).toLowerCase();
+  if(f.includes('motorway')) return 'motorway';
+  if(f.includes('trunk')) return 'trunk';
+  if(f.includes('primary')) return 'primary';
+  if(f.includes('secondary')) return 'secondary';
+  if(f.includes('tertiary')) return 'tertiary';
+  if(f.includes('allstreets')||f.includes('residential')) return 'residential';
+  if(f.includes('oneway')) return 'oneway';
+  if(f.includes('rivers')) return 'river';
+  if(f.includes('coastline')) return 'coast';
+  if(f.includes('water')) return 'water';
+  if(f.includes('green')) return 'green';
+  if(f.includes('landuse')) return 'landuse';
+  if(f.includes('buildings')) return 'buildings';
+  return null;
+}
+const svgNS='http://www.w3.org/2000/svg';
+function el(tag,attrs){ const e=document.createElementNS(svgNS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+function drawScene(){
+  const svg=document.getElementById('preview'); svg.innerHTML='';
+  svg.appendChild(el('rect',{x:0,y:0,width:520,height:360,fill:SCENE.land}));
+  const pts=a=>a.map(p=>p.join(',')).join(' ');
+  const W=w=>Math.max(1,(+w||1)*1.7);
+  for(const b of BLOCKS){
+    const r=roleOf(b); if(!r) continue;
+    const F=fields(b);
+    const line=F.lineColor?decToHex(bget(b,F.lineColor)):'#888';
+    const fill=F.fill?decToHex(bget(b,F.fill)):null;
+    const w=F.width?bget(b,F.width):1;
+    if(r==='water'&&fill) svg.appendChild(el('polygon',{points:pts(SCENE.water),fill,stroke:line,'stroke-width':1}));
+    else if(r==='green'&&fill) svg.appendChild(el('polygon',{points:pts(SCENE.green),fill,stroke:line,'stroke-width':1}));
+    else if(r==='landuse'&&fill) svg.appendChild(el('rect',{x:150,y:150,width:120,height:90,fill,stroke:line,'stroke-width':1}));
+    else if(r==='buildings'&&fill) SCENE.buildings.forEach(bb=>svg.appendChild(el('rect',{x:bb[0],y:bb[1],width:bb[2],height:bb[3],fill,stroke:line,'stroke-width':1})));
+    else if(r==='river') svg.appendChild(el('polyline',{points:pts(SCENE.river),fill:'none',stroke:line,'stroke-width':W(w),'stroke-linecap':'round','stroke-linejoin':'round'}));
+    else if(r==='coast') SCENE.roads.coast.forEach(seg=>svg.appendChild(el('polyline',{points:pts(seg),fill:'none',stroke:line,'stroke-width':W(w)})));
+    else if(SCENE.roads[r]){
+      SCENE.roads[r].forEach(seg=>svg.appendChild(el('polyline',{points:pts(seg),fill:'none',stroke:line,'stroke-width':W(w),'stroke-linecap':'round','stroke-linejoin':'round'})));
+      if(r==='oneway') SCENE.roads.oneway.forEach(seg=>drawArrows(svg,seg));
+    }
+  }
+}
+function drawArrows(svg,seg){
+  for(let t=0.3;t<1;t+=0.5){
+    const [x1,y1]=seg[0],[x2,y2]=seg[seg.length-1];
+    const x=x1+(x2-x1)*t, y=y1+(y2-y1)*t, ang=Math.atan2(y2-y1,x2-x1), s=6;
+    const p1=[x-Math.cos(ang-0.5)*s,y-Math.sin(ang-0.5)*s], p2=[x-Math.cos(ang+0.5)*s,y-Math.sin(ang+0.5)*s];
+    svg.appendChild(el('polygon',{points:[[x,y],p1,p2].map(p=>p.join(',')).join(' '),fill:'#444'}));
+  }
 }
 
-// ─── render ─────────────────────────────────────────────────────────────────
-function render() {
-  const c = document.getElementById('content');
-  if (!LAYERS.length) { c.innerHTML = '<div class="empty">Sin datos todavía.</div>'; return; }
-  const rows = LAYERS.map(L => {
-    const desc = getVal(L.descKey) ?? '';
-    const zMin = getVal(L.zoomMinKey) ?? '';
-    const zMax = getVal(L.zoomMaxKey) ?? '';
-    const auto = getVal(L.autoLabelKey) === 'TRUE';
-    const lblZ = L.labelZoomKey ? (getVal(L.labelZoomKey) ?? '') : '';
-    const lineHex = L.lineColorKey ? decToHex(getVal(L.lineColorKey)) : null;
-    const width = L.widthKey ? (getVal(L.widthKey) ?? '') : '';
-    const fillHex = L.fillKey ? decToHex(getVal(L.fillKey)) : null;
-    const casing = /casing/i.test(desc);
-    // preview de la línea (grosor real, color real) sobre el fill si hay
-    const prevBg = fillHex || '#ffffff';
-    const prevLine = lineHex || '#888';
-    const prevW = Math.max(1, Math.min(10, +width || 1));
-    return `<tr data-n="${L.n}">
-      <td class="ord">${L.n}</td>
-      <td class="desc"><input value="${desc.replace(/"/g,'&quot;')}" data-key="${L.descKey}" class="e-desc">${casing?'<span class="tag">casing</span>':''}<div class="file">${L.file||''}</div></td>
-      <td>${L.lineColorKey?`<div class="sw-wrap"><input type="color" value="${lineHex}" data-key="${L.lineColorKey}" class="e-color"><span class="muted-cell">${lineHex}</span></div>`:'<span class="muted-cell">—</span>'}</td>
-      <td>${L.widthKey?`<input type="number" min="0" max="14" value="${width}" data-key="${L.widthKey}" class="e-num">`:'<span class="muted-cell">—</span>'}</td>
-      <td>${L.fillKey?`<div class="sw-wrap"><input type="color" value="${fillHex}" data-key="${L.fillKey}" class="e-color"><span class="muted-cell">${fillHex}</span></div>`:'<span class="muted-cell">—</span>'}</td>
-      <td><input type="number" value="${zMin}" data-key="${L.zoomMinKey}" class="e-num" title="Zoom min"></td>
-      <td><input type="number" value="${zMax}" data-key="${L.zoomMaxKey}" class="e-num" title="Zoom max"></td>
-      <td>${L.labelZoomKey?`<input type="number" value="${lblZ}" data-key="${L.labelZoomKey}" class="e-num">`:'<span class="muted-cell">—</span>'}</td>
-      <td style="text-align:center"><input type="checkbox" class="chk e-chk" data-key="${L.autoLabelKey}" ${auto?'checked':''}></td>
-      <td class="preview"><div style="background:${prevBg};border:1px solid #e3e8ef;border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center"><div style="width:80%;height:${prevW}px;background:${prevLine};border-radius:${prevW}px"></div></div></td>
+// ─── tabla ──────────────────────────────────────────────────────────────────
+function render(){
+  const c=document.getElementById('content');
+  if(!BLOCKS.length){ c.innerHTML='<div class="empty">Sin datos.</div>'; return; }
+  const rows=BLOCKS.map((b,i)=>{
+    const F=fields(b);
+    const desc=bget(b,'DESCRIPTION')||'';
+    const casing=/casing/i.test(desc);
+    const lineHex=F.lineColor?decToHex(bget(b,F.lineColor)):null;
+    const width=F.width?bget(b,F.width):'';
+    const fillHex=F.fill?decToHex(bget(b,F.fill)):null;
+    const zMin=bget(b,'ZOOM\\MIN')||'', zMax=bget(b,'ZOOM\\MAX')||'';
+    const lblZ=F.labelZoom?(bget(b,F.labelZoom)||''):'';
+    const auto=bget(b,'AUTOLABEL')==='TRUE';
+    return `<tr draggable="true" data-i="${i}">
+      <td class="grip">⋮⋮</td><td class="ord">${i+1}</td>
+      <td class="desc"><input value="${(desc).replace(/"/g,'&quot;')}" data-suf="DESCRIPTION" class="e-desc">${casing?'<span class="cas">casing</span>':''}<div class="file">${bget(b,'FILE')||''}</div></td>
+      <td>${F.lineColor?`<div class="sw-wrap"><input type="color" value="${lineHex}" data-suf="${F.lineColor}" class="e-color"><span class="muted-cell">${lineHex}</span></div>`:'<span class="muted-cell">—</span>'}</td>
+      <td>${F.width?`<input type="number" min="0" max="14" value="${width}" data-suf="${F.width}" class="e-num">`:'—'}</td>
+      <td>${F.fill?`<div class="sw-wrap"><input type="color" value="${fillHex}" data-suf="${F.fill}" class="e-color"><span class="muted-cell">${fillHex}</span></div>`:'<span class="muted-cell">—</span>'}</td>
+      <td><input type="number" value="${zMin}" data-suf="ZOOM\\MIN" class="e-num"></td>
+      <td><input type="number" value="${zMax}" data-suf="ZOOM\\MAX" class="e-num"></td>
+      <td>${F.labelZoom?`<input type="number" value="${lblZ}" data-suf="${F.labelZoom}" class="e-num">`:'—'}</td>
+      <td style="text-align:center"><input type="checkbox" class="chk e-chk" data-suf="AUTOLABEL" ${auto?'checked':''}></td>
     </tr>`;
   }).join('');
-  c.innerHTML = `<table><thead><tr>
-    <th>#</th><th>Capa</th><th>Color línea/borde</th><th>Grosor</th><th>Relleno</th>
-    <th>Zoom min</th><th>Zoom max</th><th>Zoom etiqueta</th><th>Auto etiq.</th><th>Vista</th>
-  </tr></thead><tbody>${rows}</tbody></table>`;
-
-  c.querySelectorAll('.e-color').forEach(el => el.addEventListener('input', e => { setVal(e.target.dataset.key, hexToDec(e.target.value)); e.target.nextElementSibling.textContent = e.target.value; refreshPreview(e.target); }));
-  c.querySelectorAll('.e-num').forEach(el => el.addEventListener('input', e => { setVal(e.target.dataset.key, e.target.value); refreshPreview(e.target); }));
-  c.querySelectorAll('.e-desc').forEach(el => el.addEventListener('input', e => setVal(e.target.dataset.key, e.target.value)));
-  c.querySelectorAll('.e-chk').forEach(el => el.addEventListener('change', e => setVal(e.target.dataset.key, e.target.checked ? 'TRUE' : 'FALSE')));
-}
-function refreshPreview(inputEl) {
-  const tr = inputEl.closest('tr');
-  const L = LAYERS.find(x => x.n == tr.dataset.n);
-  const prevW = Math.max(1, Math.min(10, (L.widthKey ? +getVal(L.widthKey) : 1) || 1));
-  const prevLine = L.lineColorKey ? decToHex(getVal(L.lineColorKey)) : '#888';
-  const prevBg = L.fillKey ? decToHex(getVal(L.fillKey)) : '#ffffff';
-  const box = tr.querySelector('.preview > div');
-  box.style.background = prevBg;
-  const bar = box.firstElementChild;
-  bar.style.background = prevLine; bar.style.height = prevW + 'px'; bar.style.borderRadius = prevW + 'px';
+  c.innerHTML=`<table><thead><tr><th></th><th>#</th><th>Capa</th><th>Color línea</th><th>Grosor</th><th>Relleno</th><th>Z min</th><th>Z max</th><th>Z etiq.</th><th>Etiq.</th></tr></thead><tbody id="tb">${rows}</tbody></table>`;
+  const tb=c.querySelector('#tb');
+  const B=i=>BLOCKS[+i];
+  tb.querySelectorAll('.e-color').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,hexToDec(e.target.value)); e.target.nextElementSibling.textContent=e.target.value; drawScene(); }));
+  tb.querySelectorAll('.e-num').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.value); drawScene(); }));
+  tb.querySelectorAll('.e-desc').forEach(el=>el.addEventListener('input',e=>bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.value)));
+  tb.querySelectorAll('.e-chk').forEach(el=>el.addEventListener('change',e=>bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.checked?'TRUE':'FALSE')));
+  let dragI=null;
+  tb.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('dragstart',()=>{ dragI=+tr.dataset.i; tr.classList.add('drag'); });
+    tr.addEventListener('dragend',()=>{ tr.classList.remove('drag'); tb.querySelectorAll('tr').forEach(x=>x.classList.remove('over')); });
+    tr.addEventListener('dragover',e=>{ e.preventDefault(); tr.classList.add('over'); });
+    tr.addEventListener('dragleave',()=>tr.classList.remove('over'));
+    tr.addEventListener('drop',e=>{ e.preventDefault(); const to=+tr.dataset.i; if(dragI===null||dragI===to) return; const [m]=BLOCKS.splice(dragI,1); BLOCKS.splice(to,0,m); render(); drawScene(); });
+  });
 }
 
-function load(text, name) {
-  const info = parseGst(text);
-  document.getElementById('gstName').textContent = info.name || name || 'geoset';
-  document.getElementById('meta').textContent = `${info.count} capas · nombre "${info.name || '?'}" · ${LINES.length} líneas (todas preservadas al exportar)`;
-  render();
+function load(text,name){
+  parseGst(text);
+  document.getElementById('gstName').textContent=GEONAME||name||'geoset';
+  document.getElementById('meta').textContent=`${BLOCKS.length} capas · "${GEONAME||'?'}" · arrastra filas para reordenar el dibujo`;
+  render(); drawScene();
 }
 
-// ─── export (fidelidad de bytes latin1) ─────────────────────────────────────
-function exportGst() {
-  if (!LINES.length) return;
-  const text = LINES.join('\r\n');
-  const bytes = new Uint8Array(text.length);
-  for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i) & 0xff;
-  const blob = new Blob([bytes], { type: 'application/octet-stream' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = (document.getElementById('gstName').textContent || 'geoset') + '_editado.gst';
-  a.click();
-  URL.revokeObjectURL(a.href);
+// ─── export: renumera bloques y concatena ───────────────────────────────────
+function exportGst(){
+  if(!BLOCKS.length) return;
+  const out=[...PRE];
+  BLOCKS.forEach((b,idx)=>{ const newN=idx+1; const re=new RegExp('^\\\\TABLE\\\\'+b.origN+'(\\\\|$)');
+    for(const ln of b.lines){ const m=LINE_RE.exec(ln.trim());
+      if(m){ const nk=m[1].replace(re,'\\TABLE\\'+newN+'$1'); out.push('"'+nk+'" = "'+m[2]+'"'); }
+      else out.push(ln);
+    }
+  });
+  out.push(...POST);
+  const text=out.join('\r\n');
+  const bytes=new Uint8Array(text.length); for(let i=0;i<text.length;i++) bytes[i]=text.charCodeAt(i)&0xff;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([bytes],{type:'application/octet-stream'}));
+  a.download=(GEONAME||'geoset')+'_editado.gst'; a.click(); URL.revokeObjectURL(a.href);
 }
 
-// ─── eventos ────────────────────────────────────────────────────────────────
-document.getElementById('fileInput').addEventListener('change', e => {
-  const f = e.target.files[0]; if (!f) return;
-  const rd = new FileReader();
-  rd.onload = () => {
-    // preserva bytes: leemos como binario y mapeamos 1:1 a chars
-    const buf = new Uint8Array(rd.result); let s = '';
-    for (let i = 0; i < buf.length; i++) s += String.fromCharCode(buf[i]);
-    load(s, f.name.replace(/\.gst$/i, ''));
-  };
-  rd.readAsArrayBuffer(f);
-});
-document.getElementById('btnSample').addEventListener('click', () => {
-  const s = document.getElementById('sampleGst').textContent;
-  if (s && s.trim() && !s.includes('SAMPLE_GST')) load(s, 'ecuador_osm');
-  else document.getElementById('meta').textContent = 'La muestra no está incrustada en esta copia; usa "Cargar .gst".';
-});
-document.getElementById('btnExport').addEventListener('click', exportGst);
-
-// auto-cargar la muestra si está incrustada
-window.addEventListener('DOMContentLoaded', () => {
-  const s = document.getElementById('sampleGst').textContent;
-  if (s && s.trim() && !s.includes('SAMPLE_GST')) load(s, 'ecuador_osm');
-});
+document.getElementById('fileInput').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ const buf=new Uint8Array(rd.result); let s=''; for(let i=0;i<buf.length;i++) s+=String.fromCharCode(buf[i]); load(s,f.name.replace(/\.gst$/i,'')); };
+  rd.readAsArrayBuffer(f); });
+document.getElementById('btnSample').addEventListener('click',()=>{ const s=document.getElementById('sampleGst').textContent; if(s&&s.trim()&&!s.includes('SAMPLE_GST')) load(s,'ecuador_osm'); });
+document.getElementById('btnExport').addEventListener('click',exportGst);
+window.addEventListener('DOMContentLoaded',()=>{ const s=document.getElementById('sampleGst').textContent; if(s&&s.trim()&&!s.includes('SAMPLE_GST')) load(s,'ecuador_osm'); });
 </script>
 </body>
 </html>
