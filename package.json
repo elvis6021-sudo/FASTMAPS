@@ -1,0 +1,10 @@
+{
+  "name": "fastmaps-osm-visual-pipeline",
+  "version": "0.1.0",
+  "description": "Pipeline OSM -> capas visuales MapInfo (.TAB) + GeoSet (.gst) para Roadshow. Ver README.md para el handoff completo.",
+  "private": true,
+  "dependencies": {
+    "gdal-async": "^3.12.3",
+    "osm-pbf-parser": "^2.3.0"
+  }
+}
