@@ -61,9 +61,21 @@
   </div>
   <div class="side">
     <div class="card">
-      <h2>Vista previa (escena de ejemplo)</h2>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem">
+        <h2 style="margin:0;flex:1">Vista previa</h2>
+        <button class="btn" id="mvScene" style="padding:.3rem .6rem;background:#009CEB;color:#fff">Escena</button>
+        <button class="btn" id="mvReal" style="padding:.3rem .6rem;background:#eef4fa;color:#164469">Mapa real</button>
+      </div>
       <svg id="preview" viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="hint">Se dibuja con tus estilos actuales, en el orden de las capas (casing incluido). Compárala con <a href="https://www.openstreetmap.org" target="_blank">openstreetmap.org</a> y ajusta color/grosor. Arrastra las filas para reordenar el dibujo.</div>
+      <div id="realWrap" style="display:none">
+        <canvas id="realmap" width="520" height="360" style="width:100%;border-radius:10px;border:1px solid var(--line);cursor:move;display:block"></canvas>
+        <div style="display:flex;gap:.4rem;margin-top:.45rem;align-items:center">
+          <button class="btn" id="zIn" style="padding:.2rem .6rem;background:#eef4fa;color:#164469">+</button>
+          <button class="btn" id="zOut" style="padding:.2rem .6rem;background:#eef4fa;color:#164469">−</button>
+          <span class="muted-cell" id="mvStatus"></span>
+        </div>
+      </div>
+      <div class="hint">Compárala con <a href="https://www.openstreetmap.org" target="_blank">openstreetmap.org</a> y ajusta color/grosor. Arrastra las filas para reordenar. <b>Mapa real</b> lee la geometría de los <code>.TAB</code> (solo en la app de escritorio, tras "Abrir .gst…").</div>
     </div>
   </div>
 </div>
@@ -1248,8 +1260,8 @@ function render(){
   c.innerHTML=`<table><thead><tr><th></th><th>#</th><th>Capa</th><th>Color línea</th><th>Grosor</th><th>Relleno</th><th>Z min</th><th>Z max</th><th>Z etiq.</th><th>Etiq.</th></tr></thead><tbody id="tb">${rows}</tbody></table>`;
   const tb=c.querySelector('#tb');
   const B=i=>BLOCKS[+i];
-  tb.querySelectorAll('.e-color').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,hexToDec(e.target.value)); e.target.nextElementSibling.textContent=e.target.value; drawScene(); }));
-  tb.querySelectorAll('.e-num').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.value); drawScene(); }));
+  tb.querySelectorAll('.e-color').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,hexToDec(e.target.value)); e.target.nextElementSibling.textContent=e.target.value; refresh(); }));
+  tb.querySelectorAll('.e-num').forEach(el=>el.addEventListener('input',e=>{ bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.value); refresh(); }));
   tb.querySelectorAll('.e-desc').forEach(el=>el.addEventListener('input',e=>bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.value)));
   tb.querySelectorAll('.e-chk').forEach(el=>el.addEventListener('change',e=>bset(B(e.target.closest('tr').dataset.i),e.target.dataset.suf,e.target.checked?'TRUE':'FALSE')));
   let dragI=null;
@@ -1258,7 +1270,7 @@ function render(){
     tr.addEventListener('dragend',()=>{ tr.classList.remove('drag'); tb.querySelectorAll('tr').forEach(x=>x.classList.remove('over')); });
     tr.addEventListener('dragover',e=>{ e.preventDefault(); tr.classList.add('over'); });
     tr.addEventListener('dragleave',()=>tr.classList.remove('over'));
-    tr.addEventListener('drop',e=>{ e.preventDefault(); const to=+tr.dataset.i; if(dragI===null||dragI===to) return; const [m]=BLOCKS.splice(dragI,1); BLOCKS.splice(to,0,m); render(); drawScene(); });
+    tr.addEventListener('drop',e=>{ e.preventDefault(); const to=+tr.dataset.i; if(dragI===null||dragI===to) return; const [m]=BLOCKS.splice(dragI,1); BLOCKS.splice(to,0,m); render(); refresh(); });
   });
 }
 
@@ -1268,6 +1280,84 @@ function load(text,name){
   document.getElementById('meta').textContent=`${BLOCKS.length} capas · "${GEONAME||'?'}" · arrastra filas para reordenar el dibujo`;
   render(); drawScene();
 }
+
+// ─── MAPA REAL (Electron + gdal readTab -> geometría de los .TAB) ───────────
+let GST_DIR=null, REAL_ACTIVE=false, REALCACHE={}, VIEW=null, CENTER=null; const RW=520, RH=360;
+function metaCenter(){
+  let c=null,ll=null,ur=null;
+  for(const ln of PRE){ const m=LINE_RE.exec(ln.trim()); if(!m) continue;
+    if(m[1]==='\\GEOSET\\CENTER') c=m[2].split(',').map(Number);
+    if(m[1]==='\\GEOSET\\MBR\\LOWERLEFT') ll=m[2].split(',').map(Number);
+    if(m[1]==='\\GEOSET\\MBR\\UPPERRIGHT') ur=m[2].split(',').map(Number);
+  }
+  if(c&&c.length===2&&!isNaN(c[0])) return {lon:c[0],lat:c[1]};
+  if(ll&&ur) return {lon:(ll[0]+ur[0])/2,lat:(ll[1]+ur[1])/2};
+  return null;
+}
+function setView(center,spanLat){ const cosL=Math.cos(center.lat*Math.PI/180)||1; const spanLon=spanLat*(RW/RH)/cosL;
+  VIEW={ w:center.lon-spanLon/2, e:center.lon+spanLon/2, s:center.lat-spanLat/2, n:center.lat+spanLat/2, spanLat, center }; }
+function projFn(){ return (lon,lat)=>[ (lon-VIEW.w)/(VIEW.e-VIEW.w)*RW, (VIEW.n-lat)/(VIEW.n-VIEW.s)*RH ]; }
+async function loadRealMap(){
+  const st=document.getElementById('mvStatus');
+  if(!(window.fastmaps&&window.fastmaps.readTab)){ st.textContent='Solo en la app de escritorio.'; return; }
+  if(!GST_DIR){ st.textContent='Usa "Abrir .gst…" para cargar un .gst real con sus .TAB.'; return; }
+  if(!CENTER){ CENTER=metaCenter(); } if(!CENTER){ st.textContent='El .gst no trae CENTER/MBR.'; return; }
+  if(!VIEW) setView(CENTER,0.05);
+  st.textContent='Cargando geometría…'; REALCACHE={};
+  const bbox={ west:VIEW.w, south:VIEW.s, east:VIEW.e, north:VIEW.n };
+  const sep=GST_DIR.includes('\\')?'\\':'/';
+  for(const b of BLOCKS){ if(!roleOf(b)) continue; const file=bget(b,'FILE'); if(!file||REALCACHE[file]) continue;
+    try{ REALCACHE[file]=await window.fastmaps.readTab(GST_DIR+sep+file,bbox); }
+    catch(err){ REALCACHE[file]={features:[],err:String((err&&err.message)||err)}; }
+  }
+  const n=Object.values(REALCACHE).reduce((a,f)=>a+((f&&f.features)?f.features.length:0),0);
+  const errs=Object.entries(REALCACHE).filter(([,f])=>f&&f.err);
+  st.textContent = errs.length ? ('Error en '+errs[0][0]+': '+String(errs[0][1].err).slice(0,50)) : (n+' elementos · zoom '+VIEW.spanLat.toFixed(3)+'° · arrastra / +−');
+  drawRealMap();
+}
+function drawGeom(ctx,geom,P,stroke,width,fill){
+  if(!geom) return;
+  const dl=cs=>{ ctx.beginPath(); cs.forEach((c,i)=>{const p=P(c[0],c[1]); i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);}); ctx.stroke(); };
+  const dp=rings=>{ ctx.beginPath(); rings.forEach(r=>{ r.forEach((c,i)=>{const p=P(c[0],c[1]); i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);}); ctx.closePath(); });
+    if(fill){ctx.fillStyle=fill; ctx.fill('evenodd');} ctx.strokeStyle=stroke; ctx.lineWidth=Math.max(.6,width*.5); ctx.stroke(); };
+  ctx.strokeStyle=stroke; ctx.lineWidth=width; ctx.lineCap='round'; ctx.lineJoin='round';
+  const t=geom.type,C=geom.coordinates;
+  if(t==='LineString') dl(C);
+  else if(t==='MultiLineString') C.forEach(dl);
+  else if(t==='Polygon') dp(C);
+  else if(t==='MultiPolygon') C.forEach(dp);
+  else if(t==='Point'){ const p=P(C[0],C[1]); ctx.beginPath(); ctx.arc(p[0],p[1],2.2,0,7); ctx.fillStyle=stroke; ctx.fill(); }
+}
+function drawRealMap(){
+  const cv=document.getElementById('realmap'); if(!cv) return; const ctx=cv.getContext('2d');
+  ctx.fillStyle=SCENE.land; ctx.fillRect(0,0,RW,RH); if(!VIEW) return; const P=projFn();
+  for(const b of BLOCKS){ const r=roleOf(b); if(!r) continue; const file=bget(b,'FILE'); const fc=REALCACHE[file]; if(!fc||!fc.features) continue;
+    const F=fields(b); const line=F.lineColor?decToHex(bget(b,F.lineColor)):'#888';
+    const fill=F.fill?decToHex(bget(b,F.fill)):null; const w=Math.max(1,(F.width?+bget(b,F.width):1)*1.2);
+    for(const ft of fc.features) drawGeom(ctx,ft.geometry,P,line,w,fill);
+  }
+}
+function refresh(){ if(REAL_ACTIVE) drawRealMap(); else drawScene(); }
+function showMode(real){ REAL_ACTIVE=real;
+  document.getElementById('preview').style.display=real?'none':'block';
+  document.getElementById('realWrap').style.display=real?'block':'none';
+  const mr=document.getElementById('mvReal'), ms=document.getElementById('mvScene');
+  mr.style.background=real?'#009CEB':'#eef4fa'; mr.style.color=real?'#fff':'#164469';
+  ms.style.background=real?'#eef4fa':'#009CEB'; ms.style.color=real?'#164469':'#fff';
+  if(real) loadRealMap(); else drawScene();
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('mvScene').onclick=()=>showMode(false);
+  document.getElementById('mvReal').onclick=()=>showMode(true);
+  document.getElementById('zIn').onclick=()=>{ if(VIEW){ setView(VIEW.center,VIEW.spanLat/1.7); loadRealMap(); } };
+  document.getElementById('zOut').onclick=()=>{ if(VIEW){ setView(VIEW.center,VIEW.spanLat*1.7); loadRealMap(); } };
+  const cv=document.getElementById('realmap'); let dr=null;
+  cv.addEventListener('mousedown',e=>{ dr={x:e.offsetX,y:e.offsetY,moved:false}; });
+  window.addEventListener('mouseup',()=>{ if(dr&&dr.moved&&VIEW) loadRealMap(); dr=null; });
+  cv.addEventListener('mousemove',e=>{ if(!dr||!VIEW) return; dr.moved=true;
+    const dx=(e.offsetX-dr.x)/RW*(VIEW.e-VIEW.w), dy=(e.offsetY-dr.y)/RH*(VIEW.n-VIEW.s);
+    setView({lon:VIEW.center.lon-dx,lat:VIEW.center.lat+dy},VIEW.spanLat); dr.x=e.offsetX; dr.y=e.offsetY; drawRealMap(); });
+});
 
 // ─── export: renumera bloques y concatena ───────────────────────────────────
 function buildGstText(){
@@ -1300,7 +1390,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // En Electron (app de escritorio): usar diálogo nativo para abrir en vez del <input file>.
   if(window.fastmaps){
     const lbl=document.querySelector('label.btn');
-    if(lbl) lbl.addEventListener('click', async e=>{ e.preventDefault(); const r=await window.fastmaps.openGst(); if(r) load(r.text, (r.path||'').split(/[\\/]/).pop().replace(/\.gst$/i,'')); });
+    if(lbl) lbl.addEventListener('click', async e=>{ e.preventDefault(); const r=await window.fastmaps.openGst(); if(r){ GST_DIR=(r.path||'').replace(/[\\/][^\\/]*$/,''); CENTER=null; VIEW=null; load(r.text, (r.path||'').split(/[\\/]/).pop().replace(/\.gst$/i,'')); if(REAL_ACTIVE) loadRealMap(); } });
   }
 });
 </script>
