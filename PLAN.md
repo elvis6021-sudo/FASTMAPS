@@ -33,7 +33,7 @@
 **Meta:** que las calles se vean como en osm.org — jerarquía por grosor, y el borde/relleno ("casing") que da el look pulido.
 - [x] **Grosor jerárquico** (2026-07-27): AllStreets=1 (finas) < Highway2/avenidas=3 < Highway1/principales=5. Patrón `193` (vía gruesa) en Highway1/2.
 - [x] **Flecha de sentido** en `Oneway`: `SHOWLINEDIRECTION=TRUE` confirmado, grosor 2 para que la flecha se vea, capa dibujada encima de la calle normal.
-- [ ] **Casing** (borde oscuro + relleno claro): la vía más fiel es DOS capas por clase (una gruesa oscura debajo + una fina clara encima), o estilos de pen compuestos. Pendiente de elegir lo que Roadshow renderice bien.
+- [x] **Casing** (2026-07-27): cada clase de vía se dibuja 2 veces sobre el mismo `.TAB` (casing ancho oscuro debajo + fill angosto claro encima), todos los casings y luego los fills. Calles blanco/#bbb, avenidas #f7fabf/#707d05, principales #fcd6a4/#a06b00. 18 capas en el `.gst`, mismos 15 `.TAB`.
 - [ ] Ampliar `HIGHWAY_TIER` de **3 a ~6-7 clases** (motorway/trunk/primary/secondary/tertiary/residential/service) para distinguir motorway (rosa) y trunk (naranja), no solo 3 niveles.
 - [ ] **Ancho por zoom** (más fino de lejos, más grueso de cerca) con rangos `ZOOM`.
 - **Verificación:** comparación visual lado a lado con openstreetmap.org.
