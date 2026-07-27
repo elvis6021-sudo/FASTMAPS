@@ -39,12 +39,14 @@
 - **Verificación:** comparación visual lado a lado con openstreetmap.org.
 - **NOTA oneway=-1:** los tramos con `oneway=-1` (sentido inverso al de digitalización) mostrarán la flecha al revés a menos que el escritor invierta su geometría — pendiente de revisar en `mapInfoStreetsWriter.js` si se nota en la práctica.
 
-## Fase 3 — Editor de escritorio (MVP)
-**Meta:** reemplazar GeoSet Manager con una app propia para afinar el estilo sin tocar código.
-- [ ] **Electron + React.** Backend Node reutiliza `reference/gstParser.js` (leer) + un escritor con el fix COLORREF (escribir, **preservando** las claves que no editamos).
-- [ ] UI: lista de capas en **orden de dibujo**; por capa editar **color / grosor / zoom / etiqueta / relleno**.
-- [ ] **Exportar** un `.gst` válido (mismo formato exacto).
-- **Entregable:** app que carga un `.gst` real, lo edita y exporta uno válido.
+## Fase 3 — Editor de estilo (MVP) ✅ HECHA (2026-07-27)
+**Meta:** reemplazar GeoSet Manager con una herramienta propia para afinar el estilo sin tocar código.
+- [x] **Editor web** autónomo en `editor/index.html` (un solo archivo, se abre en el navegador; Electron lo envolverá en Fase 4 para el preview).
+- [x] **Parser que preserva líneas**: carga un `.gst`, indexa las claves editables por capa y re-emite conservando TODAS las claves que no se tocan. Round-trip **byte-idéntico** verificado.
+- [x] UI: capas en **orden de dibujo**; por capa se edita **color de línea/borde, relleno, grosor, zoom min/max, zoom de etiqueta y auto-etiqueta**, con vista previa del trazo. Color en COLORREF automático (usa el mismo formato validado).
+- [x] **Exportar** `.gst` válido (descarga con fidelidad de bytes latin1; editar 1 color cambia solo 1 línea).
+- **Cómo usarlo:** abrir `editor/index.html` → "Cargar .gst" (o "Cargar muestra") → editar → "Exportar .gst" → copiar a la carpeta de Roadshow.
+- **Falta (Fase 4):** vista previa del mapa real + reordenar capas (drag&drop) + empaquetar como app de escritorio.
 
 ## Fase 4 — Vista previa en vivo (el gran salto de UX)
 **Meta:** ver el mapa real actualizándose mientras ajustas, con osm.org al lado.
