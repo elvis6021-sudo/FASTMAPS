@@ -1,0 +1,16 @@
+{
+  "name": "fastmaps-editor-desktop",
+  "version": "0.1.0",
+  "description": "App de escritorio (Electron) del editor de estilo .gst de FastMaps. Envuelve editor/index.html y expone lectura/escritura nativa de archivos y lectura de geometria .TAB via gdal-async (preview real, Fase 4b).",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.3.0"
+  },
+  "dependencies": {
+    "gdal-async": "^3.12.3"
+  }
+}

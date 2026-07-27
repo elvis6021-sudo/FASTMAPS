@@ -7,3 +7,8 @@ output/
 *.IND
 *.osm
 *.pbf
+
+# Electron / Node
+node_modules/
+desktop/node_modules/
+dist/

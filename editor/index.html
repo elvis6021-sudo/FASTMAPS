@@ -1270,8 +1270,7 @@ function load(text,name){
 }
 
 // ─── export: renumera bloques y concatena ───────────────────────────────────
-function exportGst(){
-  if(!BLOCKS.length) return;
+function buildGstText(){
   const out=[...PRE];
   BLOCKS.forEach((b,idx)=>{ const newN=idx+1; const re=new RegExp('^\\\\TABLE\\\\'+b.origN+'(\\\\|$)');
     for(const ln of b.lines){ const m=LINE_RE.exec(ln.trim());
@@ -1280,7 +1279,12 @@ function exportGst(){
     }
   });
   out.push(...POST);
-  const text=out.join('\r\n');
+  return out.join('\r\n');
+}
+async function exportGst(){
+  if(!BLOCKS.length) return;
+  const text=buildGstText();
+  if(window.fastmaps){ await window.fastmaps.saveGst((GEONAME||'geoset')+'_editado.gst', text); return; } // Electron: guardar nativo
   const bytes=new Uint8Array(text.length); for(let i=0;i<text.length;i++) bytes[i]=text.charCodeAt(i)&0xff;
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([bytes],{type:'application/octet-stream'}));
   a.download=(GEONAME||'geoset')+'_editado.gst'; a.click(); URL.revokeObjectURL(a.href);
@@ -1291,7 +1295,14 @@ document.getElementById('fileInput').addEventListener('change',e=>{ const f=e.ta
   rd.readAsArrayBuffer(f); });
 document.getElementById('btnSample').addEventListener('click',()=>{ const s=document.getElementById('sampleGst').textContent; if(s&&s.trim()&&!s.includes('SAMPLE_GST')) load(s,'ecuador_osm'); });
 document.getElementById('btnExport').addEventListener('click',exportGst);
-window.addEventListener('DOMContentLoaded',()=>{ const s=document.getElementById('sampleGst').textContent; if(s&&s.trim()&&!s.includes('SAMPLE_GST')) load(s,'ecuador_osm'); });
+window.addEventListener('DOMContentLoaded',()=>{
+  const s=document.getElementById('sampleGst').textContent; if(s&&s.trim()&&!s.includes('SAMPLE_GST')) load(s,'ecuador_osm');
+  // En Electron (app de escritorio): usar diálogo nativo para abrir en vez del <input file>.
+  if(window.fastmaps){
+    const lbl=document.querySelector('label.btn');
+    if(lbl) lbl.addEventListener('click', async e=>{ e.preventDefault(); const r=await window.fastmaps.openGst(); if(r) load(r.text, (r.path||'').split(/[\\/]/).pop().replace(/\.gst$/i,'')); });
+  }
+});
 </script>
 </body>
 </html>

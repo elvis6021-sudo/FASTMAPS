@@ -53,7 +53,7 @@
 - [x] **Vista previa en vivo** (2026-07-27): escena de ejemplo (agua, parque, edificios, río, red vial con las 6 clases + casing + flecha oneway) dibujada en SVG con los estilos actuales, en el orden real de las capas; se actualiza al editar. Sirve para calibrar comparando con openstreetmap.org.
 - [x] **Reordenar capas** con drag & drop (renumeración correcta de `\TABLE\N` al exportar).
 - [ ] **Preview con geometría REAL** del `.TAB` (Electron + Node `gdal-async`/`mapInfoReader.js` → GeoJSON → MapLibre GL, reusando `reference/mapStyle.ts`). Necesita el entorno Windows/gdal; la escena de ejemplo cubre la calibración de estilo mientras tanto.
-- [ ] Empaquetar como **app de escritorio** (Electron).
+- [x] **Esqueleto Electron** (2026-07-27): `desktop/` con `main.js`/`preload.js`/`package.json` -- envuelve el editor como app de escritorio, abrir/guardar `.gst` nativo, y canal `readTab` (gdal-async -> GeoJSON) listo para el preview real. Falta conectar MapLibre (4b) y empaquetar `.exe`.
 
 ## Fase 5 — Detalles finos + ligereza
 **Meta:** rematar el look y garantizar que sea liviano y rápido.
