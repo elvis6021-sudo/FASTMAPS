@@ -5,7 +5,7 @@
 // del usuario: probar 1 capa primero).
 const path = require('path');
 const { parseOsmPbfWaysMulti, collectTaggedNodes } = require('../lib/osm/osmPbfParser');
-const { writeStreetsTab } = require('../lib/osm/mapInfoStreetsWriter');
+const { writeStreetsTab, ROAD_CLASSES } = require('../lib/osm/mapInfoStreetsWriter');
 const { writePolygonTab } = require('../lib/osm/mapInfoPolygonWriter');
 const { writePointTab } = require('../lib/osm/mapInfoPointWriter');
 
@@ -30,10 +30,17 @@ async function main() {
   log(`nodos resueltos (compartidos): ${groups.streets.nodes.size}`);
   log('Memoria: ' + JSON.stringify(process.memoryUsage()));
 
-  for (const tier of [1, 2, 3]) {
-    const label = tier === 1 ? 'Highway1' : tier === 2 ? 'Highway2' : 'AllStreets';
-    const r = writeStreetsTab(groups.streets, path.join(OUT_DIR, `${label}_EC_OSM.TAB`), `${label}_EC_OSM`, { tier });
-    log(`${label}: ${r.wayCount} escritas, ${r.skipped} descartadas`);
+  // FASE 2: un `.TAB` por CLASE OSM (motorway/trunk/primary/secondary/tertiary/residential), para
+  // darle a cada una su color + "casing" reales en el `.gst` (ver countryMapTemplate.js).
+  // residential conserva el nombre `AllStreets` (calles locales).
+  const CLASS_FILE = {
+    motorway: 'Motorway', trunk: 'Trunk', primary: 'Primary',
+    secondary: 'Secondary', tertiary: 'Tertiary', residential: 'AllStreets',
+  };
+  for (const roadClass of ROAD_CLASSES) {
+    const label = CLASS_FILE[roadClass];
+    const r = writeStreetsTab(groups.streets, path.join(OUT_DIR, `${label}_EC_OSM.TAB`), `${label}_EC_OSM`, { roadClass });
+    log(`${label} (${roadClass}): ${r.wayCount} escritas, ${r.skipped} descartadas`);
   }
 
   const buildingsResult = writePolygonTab(groups.buildings, path.join(OUT_DIR, 'Buildings_EC_OSM.TAB'), 'Buildings_EC_OSM');
