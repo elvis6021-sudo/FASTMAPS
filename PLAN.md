@@ -55,11 +55,13 @@
 - [ ] **Preview con geometría REAL** del `.TAB` (Electron + Node `gdal-async`/`mapInfoReader.js` → GeoJSON → MapLibre GL, reusando `reference/mapStyle.ts`). Necesita el entorno Windows/gdal; la escena de ejemplo cubre la calibración de estilo mientras tanto.
 - [x] **Esqueleto Electron** (2026-07-27): `desktop/` con `main.js`/`preload.js`/`package.json` -- envuelve el editor como app de escritorio, abrir/guardar `.gst` nativo, y canal `readTab` (gdal-async -> GeoJSON) listo para el preview real. Falta conectar MapLibre (4b) y empaquetar `.exe`.
 
-## Fase 5 — Detalles finos + ligereza
+## Fase 5 — Detalles finos + ligereza (en progreso)
 **Meta:** rematar el look y garantizar que sea liviano y rápido.
-- [ ] **Rangos de zoom por capa** bien calibrados (no saturar de detalle/etiquetas de lejos).
-- [ ] **POIs con símbolos reales** (íconos por categoría), flechas de sentido único, agua/costa pulidas, etiquetas.
-- [ ] **Ligereza:** visibilidad por zoom para render rápido; evaluar **simplificación de geometría por nivel SOLO en lo visual** (sin tocar el ruteo `.lmb`) para bajar peso sin perder cobertura.
+- [x] **Zoom por capa calibrado** (2026-07-27): al alejar solo quedan las vías principales -- residential hasta 10, tertiary 40, secondary 150, primary/trunk/motorway siempre. Casing y fill sincronizados. Sin reprocesar.
+- [x] **Ligereza (hook)**: `opts.simplifyTolerance` (Douglas-Peucker en grados, off por default) en `mapInfoStreetsWriter.js` -> `.TAB` de calles más livianos al activarlo en el reproceso.
+- [ ] Aplicar el simplify también a **polígonos** (edificios/uso de suelo) y exponerlo en el orquestador (`scratch_osm_country_all.js`) con un valor recomendado.
+- [ ] **POIs con símbolos reales** (íconos por categoría en vez de las formas ogr-sym).
+- [ ] **Ancho por zoom** (más fino de lejos) -- requiere capas zoom-banded por clase.
 - **Entregable:** set visual pulido y liviano.
 
 ## Fase 6 — Empaquetado y rollout
