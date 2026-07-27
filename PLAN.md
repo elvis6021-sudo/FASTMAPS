@@ -31,11 +31,13 @@
 
 ## Fase 2 — Jerarquía de anchos de calle + "casing" *(lo que más pediste)*
 **Meta:** que las calles se vean como en osm.org — jerarquía por grosor, y el borde/relleno ("casing") que da el look pulido.
-- [ ] Ampliar la clasificación `HIGHWAY_TIER` de **3 a ~6-7 clases** (motorway / trunk / primary / secondary / tertiary / residential / service), como hace OSM-Carto.
-- [ ] **Ancho por clase y por zoom** (calle fina de lejos, gruesa de cerca) usando `ZOOM\MIN/MAX` por capa.
-- [ ] **"Casing"** (borde oscuro + relleno claro): investigar la mejor vía en MapInfo/Roadshow — o dos capas por clase (una gruesa oscura debajo + una fina clara encima), o los estilos de pen compuestos (el `Pattern=193` "autopista" ya usado). Elegir lo que Roadshow renderice bien.
-- **Entregable:** nueva clasificación + capas/estilos de calle.
+- [x] **Grosor jerárquico** (2026-07-27): AllStreets=1 (finas) < Highway2/avenidas=3 < Highway1/principales=5. Patrón `193` (vía gruesa) en Highway1/2.
+- [x] **Flecha de sentido** en `Oneway`: `SHOWLINEDIRECTION=TRUE` confirmado, grosor 2 para que la flecha se vea, capa dibujada encima de la calle normal.
+- [ ] **Casing** (borde oscuro + relleno claro): la vía más fiel es DOS capas por clase (una gruesa oscura debajo + una fina clara encima), o estilos de pen compuestos. Pendiente de elegir lo que Roadshow renderice bien.
+- [ ] Ampliar `HIGHWAY_TIER` de **3 a ~6-7 clases** (motorway/trunk/primary/secondary/tertiary/residential/service) para distinguir motorway (rosa) y trunk (naranja), no solo 3 niveles.
+- [ ] **Ancho por zoom** (más fino de lejos, más grueso de cerca) con rangos `ZOOM`.
 - **Verificación:** comparación visual lado a lado con openstreetmap.org.
+- **NOTA oneway=-1:** los tramos con `oneway=-1` (sentido inverso al de digitalización) mostrarán la flecha al revés a menos que el escritor invierta su geometría — pendiente de revisar en `mapInfoStreetsWriter.js` si se nota en la práctica.
 
 ## Fase 3 — Editor de escritorio (MVP)
 **Meta:** reemplazar GeoSet Manager con una app propia para afinar el estilo sin tocar código.
